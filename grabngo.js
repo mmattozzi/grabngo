@@ -3,9 +3,9 @@ var readline = require('readline');
 const yargs = require('yargs');
 var argv = yargs
     .usage('Usage: $0 <pattern> [options]')
-    .command('pattern', 'Count the lines in a file')
+    .command('pattern', 'Extract pattern from stdin')
     .demandCommand(1)
-    .example('$0 (\d{3}-\d{3}-\d{4}) -d ,', 'Extract phone numbers and join with commas')
+    .example('$0 (\\d{3}-\\d{3}-\\d{4}) -d ,', 'Extract phone numbers and join with commas')
     .alias('d', 'delimiter')
     .nargs('d', 1)
     .describe('d', 'Delimiter for output')
@@ -14,7 +14,7 @@ var argv = yargs
     .describe('q', "Create a quoted list")
     .help('h')
     .alias('h', 'help')
-    .epilog('Copyright 2020')
+    .epilog('(C) Mike Mattozzi 2020')
     .argv;
 
 var pattern = argv._;
