@@ -12,6 +12,12 @@ var argv = yargs
     .alias('q', 'quoted')
     .nargs('q', 0)
     .describe('q', "Create a quoted list")
+    .alias('s', 'sort')
+    .nargs('s', 0)
+    .describe('s', "Sort the results")
+    .alias('u', 'unique')
+    .nargs('u', 0)
+    .describe('u', "Reduce results to a unique set")
     .help('h')
     .alias('h', 'help')
     .epilog('Copyright 2020')
@@ -39,13 +45,54 @@ if (argv.q) {
   }
 }
 
+var sort = false;
+if (argv.s) {
+  sort = true;
+}
+
+var unique = false;
+if (argv.u) {
+  unique = true;
+}
+
+var results = [];
+
+function uniq(a) {
+   return Array.from(new Set(a));
+}
+
+function end() {
+  if (sort || unique) {
+    if (sort) {
+      results.sort();
+    }
+    if (unique) {
+      results = uniq(results);
+    }
+    results.forEach(function(m) {
+      if (quoted) {
+        process.stdout.write('"' + m + '", ');
+      } else {
+        process.stdout.write(m + delimiter);
+      }
+    });
+  }
+}
+
 rl.on('line', function(line) {
     var matches = line.match(pattern);
     if (matches) {
-      if (quoted) {
-        process.stdout.write('"' + matches[1] + '", ');
+      if (sort || unique) {
+        results.push(matches[1]);
       } else {
-        process.stdout.write(matches[1] + delimiter);
+        if (quoted) {
+          process.stdout.write('"' + matches[1] + '", ');
+        } else {
+          process.stdout.write(matches[1] + delimiter);
+        }
       }
     }
 });
+
+rl.on('end', end);
+rl.on('close', end);
