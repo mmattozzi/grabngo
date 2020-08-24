@@ -3,21 +3,24 @@ var readline = require('readline');
 const yargs = require('yargs');
 var argv = yargs
     .usage('Usage: $0 <pattern> [options]')
-    .command('pattern', 'Count the lines in a file')
+    .command('pattern', 'Extract a pattern line by line and merge results')
     .demandCommand(1)
     .example('$0 (\d{3}-\d{3}-\d{4}) -d ,', 'Extract phone numbers and join with commas')
-    .alias('d', 'delimiter')
+    .alias('d', 'delimit')
     .nargs('d', 1)
-    .describe('d', 'Delimiter for output')
-    .alias('q', 'quoted')
+    .describe('d', 'Join the output with a specified delimiter')
+    .alias('q', 'quote')
     .nargs('q', 0)
-    .describe('q', "Create a quoted list")
+    .describe('q', "Join the output into a quoted list")
     .alias('s', 'sort')
     .nargs('s', 0)
     .describe('s', "Sort the results")
     .alias('u', 'unique')
     .nargs('u', 0)
     .describe('u', "Reduce results to a unique set")
+    .alias('g', 'group')
+    .nargs('g', 1)
+    .describe('g', 'Group number to extract, default: 1')
     .help('h')
     .alias('h', 'help')
     .epilog('Copyright 2020')
@@ -55,6 +58,15 @@ if (argv.u) {
   unique = true;
 }
 
+var group = 1;
+if (argv.g) {
+  group = parseInt(argv.g);
+  if (isNaN(group)) {
+    yargs.showHelp();
+    process.exit(2);
+  }
+}
+
 var results = [];
 
 function uniq(a) {
@@ -81,14 +93,14 @@ function end() {
 
 rl.on('line', function(line) {
     var matches = line.match(pattern);
-    if (matches) {
+    if (matches && matches[group]) {
       if (sort || unique) {
-        results.push(matches[1]);
+        results.push(matches[group]);
       } else {
         if (quoted) {
-          process.stdout.write('"' + matches[1] + '", ');
+          process.stdout.write('"' + matches[group] + '", ');
         } else {
-          process.stdout.write(matches[1] + delimiter);
+          process.stdout.write(matches[group] + delimiter);
         }
       }
     }
