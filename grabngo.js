@@ -73,6 +73,8 @@ function uniq(a) {
    return Array.from(new Set(a));
 }
 
+var printedOneMatch = false;
+
 function end() {
   if (sort || unique) {
     if (sort) {
@@ -83,10 +85,17 @@ function end() {
     }
     results.forEach(function(m) {
       if (quoted) {
-        process.stdout.write('"' + m + '", ');
+        if (printedOneMatch) {
+          process.stdout.write(", ");
+        }
+        process.stdout.write('"' + m + '"');
       } else {
-        process.stdout.write(m + delimiter);
+        if (printedOneMatch) {
+          process.stdout.write(delimiter)
+        }
+        process.stdout.write(m);
       }
+      printedOneMatch = true;
     });
   }
 }
@@ -98,10 +107,17 @@ rl.on('line', function(line) {
         results.push(matches[group]);
       } else {
         if (quoted) {
-          process.stdout.write('"' + matches[group] + '", ');
+          if (printedOneMatch) {
+            process.stdout.write(", ");
+          }
+          process.stdout.write('"' + matches[group] + '"');
         } else {
-          process.stdout.write(matches[group] + delimiter);
+          if (printedOneMatch) {
+            process.stdout.write(delimiter);
+          }
+          process.stdout.write(matches[group]);          
         }
+        printedOneMatch = true;
       }
     }
 });
