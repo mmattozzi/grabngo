@@ -21,6 +21,9 @@ var argv = yargs
     .alias('g', 'group')
     .nargs('g', 1)
     .describe('g', 'Group number to extract, default: 1')
+    .alias('l', 'newline')
+    .nargs('l', 0)
+    .describe('l', 'End output with a newline')
     .help('h')
     .alias('h', 'help')
     .epilog('Copyright 2020')
@@ -97,6 +100,10 @@ function end() {
       }
       printedOneMatch = true;
     });
+  }
+  
+  if (argv.l) {
+    process.stdout.write("\n");
   }
 }
 
