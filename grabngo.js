@@ -26,6 +26,10 @@ var argv = yargs
     .describe('l', 'End output with a newline')
     .help('h')
     .alias('h', 'help')
+    .nargs('prefix', 1)
+    .describe('prefix', 'Prefix in front of extracted value')
+    .nargs('suffix', 1)
+    .describe('suffix', 'Suffix after the extracted value')
     .epilog('Copyright 2020')
     .argv;
 
@@ -61,6 +65,15 @@ if (argv.u) {
   unique = true;
 }
 
+var prefix = '';
+if (argv.prefix) {
+  prefix = argv.prefix;
+}
+var suffix = '';
+if (argv.suffix) {
+  suffix = argv.suffix;
+}
+
 var group = 1;
 if (argv.g) {
   group = parseInt(argv.g);
@@ -91,12 +104,12 @@ function end() {
         if (printedOneMatch) {
           process.stdout.write(", ");
         }
-        process.stdout.write('"' + m + '"');
+        process.stdout.write('"' + prefix + m + suffix + '"');
       } else {
         if (printedOneMatch) {
           process.stdout.write(delimiter)
         }
-        process.stdout.write(m);
+        process.stdout.write(prefix + m + suffix);
       }
       printedOneMatch = true;
     });
@@ -117,12 +130,12 @@ rl.on('line', function(line) {
           if (printedOneMatch) {
             process.stdout.write(", ");
           }
-          process.stdout.write('"' + matches[group] + '"');
+          process.stdout.write('"' + prefix + matches[group] + suffix + '"');
         } else {
           if (printedOneMatch) {
             process.stdout.write(delimiter);
           }
-          process.stdout.write(matches[group]);          
+          process.stdout.write(prefix + matches[group] + suffix);          
         }
         printedOneMatch = true;
       }
