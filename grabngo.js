@@ -24,6 +24,9 @@ var argv = yargs
     .alias('l', 'newline')
     .nargs('l', 0)
     .describe('l', 'End output with a newline')
+    .alias('t', 'total')
+    .nargs('t', 0)
+    .describe('t', 'Assume the extracting values are numbers and sum them together')
     .help('h')
     .alias('h', 'help')
     .nargs('prefix', 1)
@@ -65,6 +68,12 @@ if (argv.u) {
   unique = true;
 }
 
+var sumTotal = false;
+if (argv.t) {
+  sumTotal = true;
+}
+
+
 var prefix = '';
 if (argv.prefix) {
   prefix = argv.prefix;
@@ -92,27 +101,35 @@ function uniq(a) {
 var printedOneMatch = false;
 
 function end() {
-  if (sort || unique) {
+  if (sort || unique || sumTotal) {
     if (sort) {
       results.sort();
     }
     if (unique) {
       results = uniq(results);
     }
-    results.forEach(function(m) {
-      if (quoted) {
-        if (printedOneMatch) {
-          process.stdout.write(", ");
+    if (sumTotal) {
+      var sum = 0;
+      results.forEach(function(m) {
+        sum += Number(m);
+      });
+      process.stdout.write("" + sum);
+    } else {
+      results.forEach(function(m) {
+        if (quoted) {
+          if (printedOneMatch) {
+            process.stdout.write(", ");
+          }
+          process.stdout.write('"' + prefix + m + suffix + '"');
+        } else {
+          if (printedOneMatch) {
+            process.stdout.write(delimiter)
+          }
+          process.stdout.write(prefix + m + suffix);
         }
-        process.stdout.write('"' + prefix + m + suffix + '"');
-      } else {
-        if (printedOneMatch) {
-          process.stdout.write(delimiter)
-        }
-        process.stdout.write(prefix + m + suffix);
-      }
-      printedOneMatch = true;
-    });
+        printedOneMatch = true;
+      });
+    }
   }
   
   if (argv.l) {
@@ -123,7 +140,7 @@ function end() {
 rl.on('line', function(line) {
     var matches = line.match(pattern);
     if (matches && matches[group]) {
-      if (sort || unique) {
+      if (sort || unique || sumTotal) {
         results.push(matches[group]);
       } else {
         if (quoted) {
