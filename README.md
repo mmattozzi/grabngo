@@ -14,7 +14,11 @@ Options:
   -s, --sort     Sort the results
   -u, --unique   Reduce results to a unique set
   -g, --group    Group number to extract, default: 1
+  -l, --newline  End output with a newline
+  -t, --total    Assume the extracting values are numbers and sum them together
   -h, --help     Show help                                             [boolean]
+  --prefix       Prefix in front of extracted value
+  --suffix       Suffix after the extracted value
 
 Examples:
   grabngo.js (d{3}-d{3}-d{4}) -d ,  Extract phone numbers and join with commas
